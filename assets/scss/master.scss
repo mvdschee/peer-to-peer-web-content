@@ -1,0 +1,53 @@
+/*! master.scss - v1.0 - 2018-09-26
+* Flamingos are pretty badass!
+* Copyright (c) 2018 Max van der Schee; Licensed MIT */
+
+@import "normalize";
+
+@font-face {
+    font-family: 'Quicksand', sans-serif;
+    src: url('../font/Quicksand-Regular.ttf');
+}
+
+// * {
+//     outline: red 1px solid;
+// }
+
+html {
+    font-family: 'Quicksand';
+}
+
+main {
+    position: relative;
+    height: 100vh;
+    background: #ce8098;
+    padding: 2rem 0;
+}
+
+.pop-up {
+    display: none;
+    max-width: 16rem;
+    background-color: rgba(85, 85, 85, 0.9);
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 8px;
+    margin: 0 auto;
+
+    &.show {
+        display: block;
+    }
+}
+
+.content {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.article {
+    width: 10rem;
+    height: 10rem;
+    background: white;
+    text-align: center;
+}
