@@ -1,7 +1,16 @@
+'use strict';
+
+let roomNumber = Math.floor(Math.random() * 999999).toString();
+
+const createInput = document.querySelector('#js-create-input');
+
+createInput.value = roomNumber;
+
 const clientName = Math.floor(Math.random() * 0xFFFFFF).toString(16);
+
 const webContent = [
     {
-        'id':'one',
+        'id': 'one',
         'content': 'Hello, World!'
     },
     {
@@ -10,54 +19,82 @@ const webContent = [
     }
 ];
 
-// Generate random content hash if needed
-if (!location.hash) {
-    location.hash = Math.floor(Math.random() * 0xFFFFFF).toString(16);
-}
-const contentHash = location.hash.substring(1);
+// onclick set room name for session
+let setRoomName = new Promise((resolve, reject) => {
+    document.querySelector('#js-join').onclick = () => {
+        if ( createInput.value != '') {
+            location.hash = createInput.value;
+            roomName = 'observable-' + createInput.value;
+            document.querySelector('#js-pop-up').innerHTML = 'Room name: ' + createInput.value;
+        } else {
+            location.hash = roomNumber;
+            roomName = 'observable-' + roomNumber;
+            createInput.value = roomNumber;
+            document.querySelector('#js-pop-up').innerHTML = 'Room name: ' + roomNumber;
+        }
+        document.querySelector('#js-pop-up').classList.add('show');
+        document.querySelector('#js-create').classList.add('hide');
+        resolve(roomName);
+    };
+});
 
-// TODO: Replace with your own channel ID
-const drone = new ScaleDrone('yiS12Ts5RdNhebyM');
-// Scaledrone room name needs to be prefixed with 'observable-'
-const roomName = 'observable-' + contentHash;
-// Scaledrone room used for signaling
-let room;
+// onclick copy room name for session
+document.querySelector('#js-pop-up').onclick = () => {
+    createInput.select();
+    document.execCommand("copy");
+    document.querySelector('#js-pop-up').innerHTML = 'Copied room name!';
+    setTimeout(() => {
+        document.querySelector('#js-pop-up').innerHTML = 'Room name: ' + roomNumber;
+    }, 1000);
+}
 
 const configuration = {
     iceServers: [{
-        url: 'stun:stun.l.google.com:19302'
+        urls: 'stun:stun.l.google.com:19302'
     }]
 };
+
 // RTCPeerConnection
 let pc;
 // RTCDataChannel
 let dataChannel;
 
-document.querySelector('#js-pop-up').innerHTML = 'Content URL is: ' + location.href;
-document.querySelector('#js-pop-up').classList.add('show');
+// TODO: Replace with your own channel ID
+const drone = new ScaleDrone('dHMBoLzubeBfdBQp');
+// Scaledrone room name needs to be prefixed with 'observable-'
+let roomName;
+// Scaledrone room used for signaling
+let room;
 
 // Wait for Scaledrone signalling server to connect
 drone.on('open', error => {
     if (error) {
         return console.error(error);
     }
-    room = drone.subscribe(roomName);
-    room.on('open', error => {
-        if (error) {
-            return console.error(error);
-        }
-        console.log('Connected to signaling server');
-    });
-    // We're connected to the room and received an array of 'members'
-    // connected to the room (including us). Signaling server is ready.
-    room.on('members', members => {
-        if (members.length >= 3) {
-            return alert('The room is full');
-        }
-        // If we are the second user to connect to the room we will be creating the offer
-        const isOfferer = members.length === 2;
-        startWebRTC(isOfferer);
-    });
+    setRoomName.then(
+        result => { 
+            room = drone.subscribe(result);
+            room.on('open', error => {
+                if (error) {
+                    return console.error(error);
+                }
+                console.log('Connected to signaling server');
+            });
+            // We're connected to the room and received an array of 'members'
+            // connected to the room (including us). Signaling server is ready.
+            room.on('members', members => {
+                if (members.length >= 3) {
+                    return alert('The room is full');
+                }
+                // If we are the second user to connect to the room we will be creating the offer
+                const isOfferer = members.length === 2;
+                startWebRTC(isOfferer);
+            });
+        },
+        reject => console.log(reject)
+    ).catch(
+        error => console.error(error)
+    );
 });
 
 // Send signaling data via Scaledrone
@@ -75,7 +112,9 @@ function startWebRTC(isOfferer) {
     // 'onicecandidate' notifies us whenever an ICE agent needs to deliver a
     // message to the other peer through the signaling server
     pc.onicecandidate = event => {
+        
         if (event.candidate) {
+            console.log('candidate', event.candidate);
             sendSignalingMessage({ 'candidate': event.candidate });
         }
     };
@@ -144,6 +183,8 @@ function checkDataChannelState() {
     console.log('WebRTC channel state is:', dataChannel.readyState);
     if (dataChannel.readyState === 'open') {
         document.querySelector('#js-pop-up').innerHTML = 'WebRTC data channel is now open';
+        console.log(dataChannel.readyState);
+        
         sendData();
     }
 }
@@ -164,11 +205,13 @@ function insertContentToDOM(options, isFromMe) {
 }
 
 function sendData() {
+    
     const data = {
         name: clientName,
         content: webContent,
     };
-
+    console.log(data);
+    
     dataChannel.send(JSON.stringify(data));
 
     insertContentToDOM(data, true);

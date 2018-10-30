@@ -15,27 +15,89 @@
 
 html {
     font-family: 'Quicksand';
+    color: white;
 }
 
 main {
     position: relative;
     height: 100vh;
-    background: #ce8098;
+    background: #281e3f;
     padding: 2rem 0;
 }
 
 .pop-up {
     display: none;
     max-width: 16rem;
-    background-color: rgba(85, 85, 85, 0.9);
+    padding: 8px;
+    margin: 0 auto;
+    position: relative;
+    background-color: rgba(85, 85, 85, 0.5);
     color: #fff;
     text-align: center;
     border-radius: 6px;
-    padding: 8px;
-    margin: 0 auto;
+    cursor: pointer;
 
     &.show {
         display: block;
+    }
+
+}
+
+.controls {
+    display: block;
+    margin: 2rem auto;
+    text-align: center;
+}
+
+.create {
+    display: flex;
+    flex-direction: column;
+    width: 15rem;
+    margin: 0 auto;
+    opacity: 1;
+    transition: 0.3s ease-in-out opacity;
+
+    &.hide {
+        opacity: 0;
+    }
+
+    label {
+        font-size: 1.3rem;
+    }
+    
+    input[type="text"] {
+        margin: 1rem 0 1rem;
+        padding: 0.5rem 1rem;
+        color: white;
+        background-color: #3a2c5c;
+        border: none;
+        border-bottom: 2px solid #3D4F7E;
+        border-radius: 5px;
+        outline: none;
+        transition: 0.1s ease-in-out border;
+
+        &:focus{
+            border-bottom: 4px solid #3D4F7E;
+        }
+    }
+
+    button {
+        margin: 0 4rem;
+        padding: 0.6rem 1rem;
+        color: white;
+        background-color: #0071bc;
+        border: none;
+        border-radius: 5px;
+        outline: none;
+        transition: 0.3s ease-in-out background-color;
+
+        &:hover {
+            background-color: #0081d6;
+        }
+
+        &:active {
+           background-color: #004675; 
+        }
     }
 }
 
