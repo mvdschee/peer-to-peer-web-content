@@ -20,7 +20,8 @@ html {
 
 main {
     position: relative;
-    height: 100vh;
+    height: 100%;
+    min-height: 100vh;
     background: #281e3f;
     padding: 2rem 0;
 }
@@ -105,11 +106,14 @@ main {
     display: flex;
     justify-content: space-around;
     align-items: center;
+    flex-wrap: wrap;
 }
 
 .article {
     width: 10rem;
     height: 10rem;
+    margin: 1rem;
     background: white;
+    color: grey;
     text-align: center;
 }

@@ -1,25 +1,50 @@
+// set Strict mode for JS
 'use strict';
 
+// set global variables
+// Number used for roomName
 let roomNumber = Math.floor(Math.random() * 999999).toString();
-
+// values for building webContent array
+let start = 0;
+let end = 20;
+// RTCPeerConnection
+let pc;
+// RTCDataChannel
+let dataChannel;
+// Scaledrone room name needs to be prefixed with 'observable-'
+let roomName;
+// Scaledrone room used for signaling
+let room;
+// Input field for changing roomNumber
 const createInput = document.querySelector('#js-create-input');
+// Clientname to verify data is send from other user
+const clientName = Math.floor(Math.random() * 0xFFFFFF).toString(16);
+// Array with content
+const webContent = [];
+// TODO: Replace with your own channel ID
+const drone = new ScaleDrone('dHMBoLzubeBfdBQp');
+// Config for ICE framework with STUN servers
+const configuration = {
+    iceServers: [{
+        urls: 'stun:stun.l.google.com:19302'
+    }]
+};
 
+// Automagic set roomNumber in inputfield
 createInput.value = roomNumber;
 
-const clientName = Math.floor(Math.random() * 0xFFFFFF).toString(16);
+console.log('your client name is:', clientName);
 
-const webContent = [
-    {
-        'id': 'one',
-        'content': 'Hello, World!'
-    },
-    {
-        'id': 'two',
-        'content': 'Hello, World!'
-    }
-];
+// Fill array with content
+for (var i = start; i < end + 1; i++) {
+    webContent.push({
+        'id': i,
+        'content': 'Hello, World!',
+        'clientname': clientName
+    });
+}
 
-// onclick set room name for session
+// wait for onclick event to set roomName for signalling session
 let setRoomName = new Promise((resolve, reject) => {
     document.querySelector('#js-join').onclick = () => {
         if ( createInput.value != '') {
@@ -40,37 +65,21 @@ let setRoomName = new Promise((resolve, reject) => {
 
 // onclick copy room name for session
 document.querySelector('#js-pop-up').onclick = () => {
+    let innerContent = document.querySelector('#js-pop-up').innerHTML;
     createInput.select();
     document.execCommand("copy");
     document.querySelector('#js-pop-up').innerHTML = 'Copied room name!';
     setTimeout(() => {
-        document.querySelector('#js-pop-up').innerHTML = 'Room name: ' + roomNumber;
+        document.querySelector('#js-pop-up').innerHTML = innerContent;
     }, 1000);
 }
-
-const configuration = {
-    iceServers: [{
-        urls: 'stun:stun.l.google.com:19302'
-    }]
-};
-
-// RTCPeerConnection
-let pc;
-// RTCDataChannel
-let dataChannel;
-
-// TODO: Replace with your own channel ID
-const drone = new ScaleDrone('dHMBoLzubeBfdBQp');
-// Scaledrone room name needs to be prefixed with 'observable-'
-let roomName;
-// Scaledrone room used for signaling
-let room;
 
 // Wait for Scaledrone signalling server to connect
 drone.on('open', error => {
     if (error) {
         return console.error(error);
     }
+    // Waits for promise te resolve and accept roomName
     setRoomName.then(
         result => { 
             room = drone.subscribe(result);
@@ -172,7 +181,6 @@ function localDescCreated(desc) {
 
 // Hook up data channel event handlers
 function setupDataChannel() {
-    checkDataChannelState();
     dataChannel.onopen = checkDataChannelState;
     dataChannel.onclose = checkDataChannelState;
     dataChannel.onmessage = event => 
@@ -183,16 +191,16 @@ function checkDataChannelState() {
     console.log('WebRTC channel state is:', dataChannel.readyState);
     if (dataChannel.readyState === 'open') {
         document.querySelector('#js-pop-up').innerHTML = 'WebRTC data channel is now open';
-        console.log(dataChannel.readyState);
-        
-        sendData();
+        dataChannel.send(JSON.stringify(webContent));
     }
 }
 
 function insertContentToDOM(options, isFromMe) {
-   
+    document.querySelector('#js-create').style.display = "none";
+    console.log(options);
+    
     if (isFromMe !== true) {
-        options.content.forEach(element => {
+        options.forEach(element => {
             const template = document.querySelector('template[data-template="article"]');
             template.content.querySelector('.article-text').innerText = element.content;
             const clone = document.importNode(template.content, true);
@@ -203,18 +211,3 @@ function insertContentToDOM(options, isFromMe) {
         });
     }
 }
-
-function sendData() {
-    
-    const data = {
-        name: clientName,
-        content: webContent,
-    };
-    console.log(data);
-    
-    dataChannel.send(JSON.stringify(data));
-
-    insertContentToDOM(data, true);
-}
-
-
