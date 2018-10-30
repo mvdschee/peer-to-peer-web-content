@@ -1,3 +1,5 @@
+![](preview.png)
+
 # Peer-to-Peer content delivery
 
 A Peer-to-peer (P2P) demo for delivering content via WebRTC.
