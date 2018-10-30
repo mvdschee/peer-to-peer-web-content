@@ -2,8 +2,6 @@
 
 A Peer-to-peer (P2P) demo for delivering content via WebRTC.
 
-Keep in mind I needed 3 servers to setup a P2P connection for 2 clients to connect. This seems to me a bit of an overkill, so please don't use this for content delivery. WebRTC is not ideal for this use case.
-
 ## Credits
 
 - [normalize](github.com/necolas/normalize.css) by Nicolas Gallagher
