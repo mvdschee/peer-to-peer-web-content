@@ -1,8 +1,11 @@
-![](preview.png)
-
 # Peer-to-Peer content delivery
 
 A Peer-to-peer (P2P) demo for delivering content via WebRTC.
+![](preview.png)
+
+[Medium post](https://medium.com/@maxvanderschee/the-power-of-peer-to-peer-right-in-your-browser-16fbeff0d44d)
+
+[Demo](https://demo.dev-attic.com/peer-to-peer-web-content/index.html)
 
 ## Credits
 
@@ -14,7 +17,7 @@ This resource can be used freely if integrated or build upon in personal or comm
 
 ## Misc
 
-Follow Me: [Medium](https://medium.com/@maxvanderschee), [GitHub](https://github.com/mvdschee)
+Follow Me: [Medium](https://medium.com/@maxvanderschee), [GitHub](https://github.com/mvdschee), [Twitter](https://twitter.com/maxvanderschee)
 
 [© Max van der Schee 2018](https://maxvanderschee.nl)
 
